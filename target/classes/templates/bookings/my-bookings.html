@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>My Bookings - Car Rental Service</title>
+    <th:block layout:fragment="styles">
+        <style>
+            .booking-card {
+                position: relative;
+                transition: transform 0.2s;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .booking-card:hover {
+                transform: translateY(-5px);
+            }
+            
+            .booking-id {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                background: rgba(255,255,255,0.9);
+                padding: 5px 10px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                z-index: 1;
+            }
+            
+            .status-badge {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                z-index: 1;
+            }
+            
+            .car-image {
+                height: 200px;
+                object-fit: cover;
+            }
+            
+            .dates {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+            
+            .price {
+                font-weight: bold;
+                color: #28a745;
+            }
+            
+            .cancel-btn {
+                transition: all 0.2s;
+            }
+            
+            .cancel-btn:hover {
+                background-color: #dc3545;
+                color: white;
+            }
+            
+            .alert {
+                border-radius: 10px;
+                margin-bottom: 2rem;
+            }
+            
+            .alert-icon {
+                font-size: 1.2rem;
+                margin-right: 0.5rem;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container py-5">
+            <h1 class="text-center mb-4">My Bookings</h1>
+            
+            <!-- Success Message -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill alert-icon"></i>
+                <span th:text="${success}">Success message here</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <!-- Error Message -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+                <span th:text="${error}">Error message here</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Book a Car Button -->
+            <div class="text-center mb-4">
+                <a th:href="@{/cars}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Book Another Car
+                </a>
+            </div>
+
+            <!-- Bookings List -->
+            <div class="row g-4">
+                <div th:each="booking : ${bookings}" class="col-md-6 col-lg-4">
+                    <div class="card booking-card h-100">
+                        <!-- Booking ID -->
+                        <div class="booking-id">
+                            <i class="bi bi-hash"></i>
+                            <span th:text="${booking.id}">123</span>
+                        </div>
+
+                        <!-- Status Badge -->
+                        <span th:class="'badge status-badge ' + 
+                                     (${booking.status == 'CONFIRMED'} ? 'bg-success' : 
+                                      ${booking.status == 'PENDING'} ? 'bg-warning' :
+                                      ${booking.status == 'CANCELLED'} ? 'bg-danger' : 'bg-secondary')"
+                              th:text="${booking.status}">
+                            Status
+                        </span>
+
+                        <!-- Car Image -->
+                        <img th:src="${booking.car.imageUrl}" class="card-img-top car-image" alt="Car Image">
+
+                        <div class="card-body">
+                            <!-- Car Details -->
+                            <h5 class="card-title">
+                                <i class="bi bi-car-front-fill me-2"></i>
+                                <span th:text="${booking.car.make + ' ' + booking.car.model}">Car Name</span>
+                            </h5>
+
+                            <!-- Booking Dates -->
+                            <div class="dates mb-3">
+                                <div>
+                                    <i class="bi bi-calendar-check"></i>
+                                    Pickup: <span th:text="${#temporals.format(booking.startDate, 'MMM dd, yyyy')}">Jan 1, 2024</span>
+                                </div>
+                                <div>
+                                    <i class="bi bi-calendar-x"></i>
+                                    Return: <span th:text="${#temporals.format(booking.endDate, 'MMM dd, yyyy')}">Jan 5, 2024</span>
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div th:if="${booking.notes}" class="mb-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-chat-left-text"></i>
+                                    Notes: <span th:text="${booking.notes}">Additional notes here</span>
+                                </small>
+                            </div>
+
+                            <!-- Price and Actions -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-currency-dollar"></i>
+                                    Total: <span th:text="${#numbers.formatDecimal(booking.totalPrice, 1, 2)}">Price</span>
+                                </h6>
+                                
+                                <!-- Cancel Button (only for PENDING bookings) -->
+                                <form th:if="${booking.status == 'PENDING'}" 
+                                      th:action="@{/bookings/cancel/{id}(id=${booking.id})}" 
+                                      method="post" 
+                                      class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm cancel-btn"
+                                            onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                        <i class="bi bi-x-circle"></i> Cancel Booking
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Bookings Message -->
+                <div th:if="${#lists.isEmpty(bookings)}" class="col-12 text-center">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        You don't have any bookings yet. 
+                        <a th:href="@{/cars}" class="alert-link">Browse available cars</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            // Auto-hide alerts after 5 seconds
+            $(document).ready(function(){
+                setTimeout(function(){
+                    $('.alert').alert('close');
+                }, 5000);
+            });
+        </script>
+    </th:block>
+</body>
+</html> 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Booking Confirmed - Car Rental Service</title>
+    <th:block layout:fragment="styles">
+        <style>
+            .confirmation-card {
+                border-radius: 15px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                transition: transform 0.3s;
+            }
+            
+            .confirmation-card:hover {
+                transform: translateY(-5px);
+            }
+            
+            .success-icon {
+                font-size: 4rem;
+                color: #28a745;
+                margin-bottom: 1rem;
+            }
+            
+            .booking-details {
+                background-color: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                margin-top: 20px;
+            }
+            
+            .detail-item {
+                margin-bottom: 10px;
+                padding: 8px;
+                border-bottom: 1px solid #dee2e6;
+            }
+            
+            .detail-item:last-child {
+                border-bottom: none;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card confirmation-card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle-fill success-icon"></i>
+                            <h2 class="card-title mb-4">Booking Confirmed!</h2>
+                            <p class="lead">Thank you for choosing our service.</p>
+                            
+                            <div class="booking-details">
+                                <div class="detail-item">
+                                    <strong>Booking ID:</strong>
+                                    <span th:text="${booking.id}">#123</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Car:</strong>
+                                    <span th:text="${booking.car.make + ' ' + booking.car.model}">Car Name</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Pick-up Date:</strong>
+                                    <span th:text="${#temporals.format(booking.startDate, 'MMM dd, yyyy')}">Jan 1, 2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Return Date:</strong>
+                                    <span th:text="${#temporals.format(booking.endDate, 'MMM dd, yyyy')}">Jan 5, 2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Total Price:</strong>
+                                    <span th:text="${'$' + #numbers.formatDecimal(booking.totalPrice, 1, 2)}">$100.00</span>
+                                </div>
+                                <div class="detail-item" th:if="${booking.notes}">
+                                    <strong>Notes:</strong>
+                                    <span th:text="${booking.notes}">Additional notes</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <a th:href="@{/bookings/my-bookings}" class="btn btn-primary me-2">
+                                    <i class="bi bi-list-ul me-2"></i>View My Bookings
+                                </a>
+                                <a th:href="@{/cars}" class="btn btn-outline-primary">
+                                    <i class="bi bi-car-front me-2"></i>Browse More Cars
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

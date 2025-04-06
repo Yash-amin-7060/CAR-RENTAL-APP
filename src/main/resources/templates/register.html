@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Register - Car Rental Service</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="auth-container">
+            <div class="auth-wrapper">
+                <div class="auth-header">
+                    <div class="auth-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2>Create Account</h2>
+                    <p>Join our premium car rental service today</p>
+                </div>
+
+                <div class="auth-body">
+                    <div th:if="${error}" class="auth-alert error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <form th:action="@{/register}" method="post" th:object="${user}" class="needs-validation" novalidate>
+                        <div class="auth-form-group">
+                            <label for="firstName">First Name</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="firstName" th:field="*{firstName}" 
+                                       placeholder="Enter your first name" required
+                                       autocomplete="given-name">
+                            </div>
+                        </div>
+
+                        <div class="auth-form-group">
+                            <label for="lastName">Last Name</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="lastName" th:field="*{lastName}" 
+                                       placeholder="Enter your last name" required
+                                       autocomplete="family-name">
+                            </div>
+                        </div>
+
+                        <div class="auth-form-group">
+                            <label for="email">Email Address</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" id="email" th:field="*{email}" 
+                                       placeholder="Enter your email" required
+                                       autocomplete="email">
+                            </div>
+                        </div>
+
+                        <div class="auth-form-group">
+                            <label for="password">Password</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="password" th:field="*{password}" 
+                                       placeholder="Create a password" required
+                                       minlength="6" autocomplete="new-password">
+                            </div>
+                        </div>
+
+                        <div class="auth-form-group">
+                            <label for="phoneNumber">Phone Number</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-phone input-icon"></i>
+                                <input type="tel" id="phoneNumber" th:field="*{phoneNumber}" 
+                                       placeholder="Enter your phone number" required
+                                       pattern="[0-9]{10}" autocomplete="tel">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="auth-button">
+                            <i class="fas fa-user-plus"></i>Create Account
+                        </button>
+                    </form>
+
+                    <div class="auth-footer">
+                        <p>Already have an account? <a href="/login">Sign in here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            (function () {
+                'use strict'
+                var forms = document.querySelectorAll('.needs-validation')
+                Array.prototype.slice.call(forms).forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+            })()
+        </script>
+    </th:block>
+</body>
+</html> 
