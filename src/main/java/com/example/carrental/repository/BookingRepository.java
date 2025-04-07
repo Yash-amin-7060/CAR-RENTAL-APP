@@ -15,7 +15,7 @@ import com.example.carrental.model.User;
 @Repository
 @Transactional(readOnly = true)
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.car WHERE b.user = :user ORDER BY b.startDate DESC")
+    @Query("SELECT b FROM Booking b LEFT JOIN FETCH b.car WHERE b.user = :user AND b.status != 'CANCELLED' ORDER BY b.startDate DESC")
     List<Booking> findByUser(@Param("user") User user);
     
     List<Booking> findByCar_Owner(String owner);

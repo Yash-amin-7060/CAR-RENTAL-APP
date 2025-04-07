@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Leave Feedback - Car Rental Service</title>
+    <th:block layout:fragment="styles">
+        <style>
+            .rating {
+                display: inline-block;
+                position: relative;
+                height: 50px;
+                line-height: 50px;
+                font-size: 50px;
+            }
+
+            .rating label {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                cursor: pointer;
+            }
+
+            .rating label:last-child {
+                position: static;
+            }
+
+            .rating label:nth-child(1) { z-index: 5; }
+            .rating label:nth-child(2) { z-index: 4; }
+            .rating label:nth-child(3) { z-index: 3; }
+            .rating label:nth-child(4) { z-index: 2; }
+            .rating label:nth-child(5) { z-index: 1; }
+
+            .rating label input {
+                position: absolute;
+                top: 0;
+                left: 0;
+                opacity: 0;
+            }
+
+            .rating label .icon {
+                float: left;
+                color: transparent;
+            }
+
+            .rating label:last-child .icon {
+                color: #000;
+            }
+
+            .rating:not(:hover) label input:checked ~ .icon,
+            .rating:hover label:hover input ~ .icon {
+                color: #ffd700;
+            }
+
+            .rating label input:focus:not(:checked) ~ .icon:last-child {
+                color: #000;
+                text-shadow: 0 0 5px #ffd700;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="text-center mb-0">Leave Feedback</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Car Details -->
+                            <div class="mb-4">
+                                <h5>Car Details:</h5>
+                                <p class="mb-1">
+                                    <strong>Make & Model:</strong> 
+                                    <span th:text="${car.make + ' ' + car.model}">Car Name</span>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Booking ID:</strong> 
+                                    <span th:text="${booking.id}">123</span>
+                                </p>
+                            </div>
+
+                            <!-- Feedback Form -->
+                            <form th:action="@{/feedback/submit}" method="post">
+                                <input type="hidden" name="bookingId" th:value="${booking.id}">
+                                
+                                <!-- Star Rating -->
+                                <div class="mb-4">
+                                    <label class="form-label">Rating:</label>
+                                    <div class="rating">
+                                        <label>
+                                            <input type="radio" name="rating" value="1" required>
+                                            <span class="icon">★</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="rating" value="2">
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="rating" value="3">
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="rating" value="4">
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="rating" value="5">
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                            <span class="icon">★</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Comment -->
+                                <div class="mb-4">
+                                    <label for="comment" class="form-label">Your Feedback:</label>
+                                    <textarea class="form-control" 
+                                              id="comment" 
+                                              name="comment" 
+                                              rows="4" 
+                                              required
+                                              placeholder="Please share your experience..."></textarea>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send"></i> Submit Feedback
+                                    </button>
+                                    <a th:href="@{/bookings/my-bookings}" class="btn btn-secondary">
+                                        <i class="bi bi-x"></i> Cancel
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

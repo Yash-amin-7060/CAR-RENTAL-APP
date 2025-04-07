@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${car.make + ' ' + car.model + ' - Feedback'}">Car Feedback</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="mb-4" th:text="${car.make + ' ' + car.model + ' - Feedback'}">Car Feedback</h2>
+                    
+                    <!-- Average Rating -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Average Rating</h5>
+                            <div class="display-4 text-warning">
+                                <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">4.5</span>
+                                <small class="text-muted fs-6">/ 5.0</small>
+                            </div>
+                            <p class="card-text">
+                                Based on <span th:text="${feedbacks.size()}">0</span> reviews
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feedback List -->
+                    <div th:if="${!feedbacks.isEmpty()}" class="card">
+                        <div class="card-body">
+                            <div th:each="feedback : ${feedbacks}" class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-warning mb-1">
+                                            <span th:each="i : ${#numbers.sequence(1, feedback.rating)}">★</span>
+                                            <span th:each="i : ${#numbers.sequence(feedback.rating + 1, 5)}">☆</span>
+                                        </div>
+                                        <p class="mb-1" th:text="${feedback.comment}">Feedback comment</p>
+                                        <small class="text-muted" 
+                                               th:text="${#temporals.format(feedback.createdAt, 'MMM dd, yyyy')}">
+                                            Date
+                                        </small>
+                                    </div>
+                                </div>
+                                <hr th:if="${!feedbackStat.last}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- No Feedback Message -->
+                    <div th:if="${feedbacks.isEmpty()}" class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No feedback available for this car yet.
+                    </div>
+
+                    <!-- Back Button -->
+                    <div class="mt-4">
+                        <a th:href="@{/cars}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Cars
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
