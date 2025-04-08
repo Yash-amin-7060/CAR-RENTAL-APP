@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${car.make + ' ' + car.model}">Car Details</title>
+    <style>
+        .car-image {
+            max-height: 400px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .details-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .details-label {
+            font-weight: bold;
+            color: #6c757d;
+        }
+        
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container py-5">
+            <div class="row">
+                <!-- Car Images Section -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <img th:if="${car.imageUrl != null}" th:src="${car.imageUrl}" class="card-img-top car-image" alt="Car Image">
+                        <img th:unless="${car.imageUrl != null}" src="/images/default-car.jpg" class="card-img-top car-image" alt="Default Car Image">
+                        
+                        <div class="card-body">
+                            <h4 class="card-title" th:text="${car.make + ' ' + car.model}">Car Name</h4>
+                            <p class="card-text">
+                                <span class="badge rounded-pill bg-primary me-2" th:text="${car.type}">Type</span>
+                                <span class="badge rounded-pill bg-secondary me-2" th:text="${car.transmission}">Transmission</span>
+                                <span class="badge rounded-pill bg-info" th:text="${car.fuelType}">Fuel Type</span>
+                            </p>
+                            <p class="price-tag">$<span th:text="${car.pricePerDay}">50</span>/day</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Car Details Section -->
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Car Details</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="details-item">
+                                <span class="details-label">Location:</span>
+                                <span th:text="${car.location}">New York</span>
+                            </div>
+                            <div class="details-item">
+                                <span class="details-label">Owner:</span>
+                                <span th:text="${car.owner}">John Doe</span>
+                            </div>
+                            <div class="details-item">
+                                <span class="details-label">Insurance:</span>
+                                <span th:text="${car.insurance}">Full Coverage</span>
+                            </div>
+                            <div class="details-item">
+                                <span class="details-label">Availability:</span>
+                                <span th:if="${car.availabilityStatus}" class="text-success">Available</span>
+                                <span th:unless="${car.availabilityStatus}" class="text-danger">Not Available</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        <a sec:authorize="isAuthenticated()" th:if="${car.availabilityStatus}"
+                           th:href="@{/bookings/create/{id}(id=${car.carId})}" 
+                           class="btn btn-primary">
+                            <i class="bi bi-calendar-plus"></i> Book Now
+                        </a>
+                        <a sec:authorize="!isAuthenticated()"
+                           th:href="@{/login}"
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-person"></i> Login to Book
+                        </a>
+                        <a th:href="@{/cars/{id}/feedback(id=${car.carId})}" class="btn btn-outline-secondary">
+                            <i class="bi bi-star"></i> View Reviews
+                        </a>
+                        <a th:href="@{/cars}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Car List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

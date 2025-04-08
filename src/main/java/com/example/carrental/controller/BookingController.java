@@ -300,4 +300,72 @@ public class BookingController {
         }
         return "redirect:/bookings/my-bookings";
     }
+
+    @GetMapping("/update-statuses")
+    public String updateBookingStatuses(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                      RedirectAttributes redirectAttributes) {
+        logger.info("Updating booking statuses");
+        
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("error", "Please log in to view your bookings");
+            return "redirect:/login";
+        }
+        
+        try {
+            bookingService.updateBookingStatuses();
+            redirectAttributes.addFlashAttribute("success", "Booking statuses updated successfully!");
+        } catch (Exception e) {
+            logger.error("Error updating booking statuses: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error updating booking statuses: " + e.getMessage());
+        }
+        
+        return "redirect:/bookings/my-bookings";
+    }
+    
+    @PostMapping("/complete/{id}")
+    public String completeBooking(@PathVariable Long id,
+                                @AuthenticationPrincipal CustomUserDetails userDetails,
+                                RedirectAttributes redirectAttributes) {
+        logger.info("Manually completing booking ID: {}", id);
+        
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("error", "Please log in to manage your bookings");
+            return "redirect:/login";
+        }
+        
+        try {
+            // Get the booking
+            Booking booking = bookingService.getBookingById(id);
+            if (booking == null) {
+                throw new RuntimeException("Booking not found");
+            }
+            
+            // Verify the booking belongs to the current user
+            User user = userService.getUserByEmail(userDetails.getUsername());
+            if (!booking.getUser().equals(user)) {
+                throw new RuntimeException("Unauthorized to complete this booking");
+            }
+            
+            // Don't allow completing cancelled bookings
+            if ("CANCELLED".equals(booking.getStatus())) {
+                throw new RuntimeException("Cannot complete a cancelled booking");
+            }
+            
+            // Update booking status
+            booking.setStatus("COMPLETED");
+            bookingService.updateBooking(booking);
+            
+            // Make car available again
+            Car car = booking.getCar();
+            car.setAvailabilityStatus(true);
+            carService.updateCar(car);
+            
+            redirectAttributes.addFlashAttribute("success", "Booking marked as completed! You can now leave feedback.");
+        } catch (Exception e) {
+            logger.error("Error completing booking ID {}: {}", id, e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Error completing booking: " + e.getMessage());
+        }
+        
+        return "redirect:/bookings/my-bookings";
+    }
 } 

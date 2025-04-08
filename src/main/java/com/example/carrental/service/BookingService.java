@@ -1,5 +1,6 @@
 package com.example.carrental.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -256,6 +257,54 @@ public class BookingService {
         } catch (Exception e) {
             logger.error("Error resetting pending bookings: {}", e.getMessage());
             throw new RuntimeException("Failed to reset pending bookings", e);
+        }
+    }
+    
+    @Transactional
+    public void updateBookingStatuses() {
+        logger.info("Updating booking statuses based on dates");
+        LocalDate today = LocalDate.now();
+        
+        try {
+            // Get all confirmed bookings
+            List<Booking> confirmedBookings = bookingRepository.findByStatus("CONFIRMED");
+            
+            for (Booking booking : confirmedBookings) {
+                // If end date has passed, mark as completed
+                if (booking.getEndDate() != null && booking.getEndDate().isBefore(today)) {
+                    booking.setStatus("COMPLETED");
+                    bookingRepository.save(booking);
+                    
+                    // Make car available again
+                    Car car = booking.getCar();
+                    car.setAvailabilityStatus(true);
+                    carRepository.save(car);
+                    
+                    logger.info("Marked booking {} as COMPLETED", booking.getId());
+                }
+            }
+            
+            logger.info("Successfully updated booking statuses");
+        } catch (Exception e) {
+            logger.error("Error updating booking statuses: {}", e.getMessage());
+            throw new RuntimeException("Failed to update booking statuses", e);
+        }
+    }
+    
+    @Transactional
+    public Booking updateBooking(Booking booking) {
+        logger.info("Updating booking ID: {}", booking.getId());
+        
+        if (booking == null || booking.getId() == null) {
+            logger.error("Invalid booking data for update");
+            throw new IllegalArgumentException("Booking data is invalid for update");
+        }
+        
+        try {
+            return bookingRepository.save(booking);
+        } catch (Exception e) {
+            logger.error("Error updating booking: {}", e.getMessage());
+            throw new RuntimeException("Failed to update booking", e);
         }
     }
 } 

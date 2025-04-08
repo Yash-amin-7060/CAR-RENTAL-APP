@@ -90,10 +90,20 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
+            <!-- Info about feedback system -->
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Feedback System:</strong> You can leave feedback for your completed bookings. 
+                If you've finished a booking but don't see the feedback option, click the "Update Booking Statuses" button.
+            </div>
+
             <!-- Book a Car Button -->
             <div class="text-center mb-4">
                 <a th:href="@{/cars}" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Book Another Car
+                </a>
+                <a th:href="@{/bookings/update-statuses}" class="btn btn-outline-secondary ms-2">
+                    <i class="bi bi-arrow-clockwise"></i> Update Booking Statuses
                 </a>
             </div>
 
@@ -179,16 +189,61 @@
                                     Total: <span th:text="${#numbers.formatDecimal(booking.totalPrice, 1, 2)}">Price</span>
                                 </h6>
                                 
-                                <!-- Cancel Button (only for PENDING bookings) -->
-                                <form th:if="${booking.status == 'PENDING'}" 
-                                      th:action="@{/bookings/cancel/{id}(id=${booking.id})}" 
-                                      method="post" 
-                                      class="d-inline">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm cancel-btn"
-                                            onclick="return confirm('Are you sure you want to cancel this booking?')">
-                                        <i class="bi bi-x-circle"></i> Cancel Booking
-                                    </button>
-                                </form>
+                                <div>
+                                    <!-- Cancel Button (only for PENDING bookings) -->
+                                    <form th:if="${booking.status == 'PENDING'}" 
+                                          th:action="@{/bookings/cancel/{id}(id=${booking.id})}" 
+                                          method="post" 
+                                          class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm cancel-btn"
+                                                onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                            <i class="bi bi-x-circle"></i> Cancel Booking
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Feedback Button (for COMPLETED bookings) -->
+                                    <a th:if="${booking.status == 'COMPLETED' or booking.status == 'CONFIRMED'}" 
+                                       th:href="@{/feedback/create/{id}(id=${booking.id})}"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-star"></i> Leave Feedback
+                                    </a>
+                                    
+                                    <!-- View Car Details -->
+                                    <a th:href="@{/cars/{id}/feedback(id=${booking.car.carId})}"
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-info-circle"></i> View Reviews
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Feedback Section -->
+                            <div th:if="${booking.status != 'CANCELLED'}" class="mt-3 pt-3 border-top">
+                                <div class="d-grid">
+                                    <!-- Show direct feedback button -->
+                                    <a th:if="${booking.status == 'COMPLETED' or booking.status == 'CONFIRMED'}" 
+                                       th:href="@{/feedback/create/{id}(id=${booking.id})}"
+                                       class="btn btn-primary">
+                                        <i class="bi bi-star-fill me-1"></i> Write a Review
+                                    </a>
+                                    
+                                    <!-- Show message for non-completed bookings -->
+                                    <div th:if="${booking.status != 'COMPLETED' and booking.status != 'CONFIRMED'}" class="text-center">
+                                        <p class="text-muted mb-2">Reviews can be submitted after booking completion</p>
+                                        <a th:href="@{/bookings/update-statuses}" class="btn btn-outline-primary">
+                                            <i class="bi bi-arrow-clockwise me-1"></i> Update Status
+                                        </a>
+                                        
+                                        <!-- Add manual completion button for testing -->
+                                        <form th:if="${booking.status == 'PENDING' or booking.status == 'CONFIRMED'}" 
+                                              th:action="@{/bookings/complete/{id}(id=${booking.id})}" 
+                                              method="post" 
+                                              class="mt-2">
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="bi bi-check-circle me-1"></i> Mark as Completed
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

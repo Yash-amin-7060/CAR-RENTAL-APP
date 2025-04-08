@@ -65,6 +65,15 @@
                                           class="badge bg-danger">
                                         Not Available
                                     </span>
+                                    
+                                    <div class="btn-group w-100">
+                                        <a th:href="@{/cars/{id}(id=${car.carId})}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-info-circle"></i> Details
+                                        </a>
+                                        <a th:href="@{/cars/{id}/feedback(id=${car.carId})}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-star"></i> Reviews
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

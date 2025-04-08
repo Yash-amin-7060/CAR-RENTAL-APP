@@ -1,13 +1,24 @@
 package com.example.carrental.controller;
 
-import com.example.carrental.model.*;
-import com.example.carrental.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.example.carrental.model.Booking;
+import com.example.carrental.model.Car;
+import com.example.carrental.model.Feedback;
+import com.example.carrental.model.User;
+import com.example.carrental.service.BookingService;
+import com.example.carrental.service.CarService;
+import com.example.carrental.service.CustomUserDetailsService;
+import com.example.carrental.service.FeedbackService;
 
 @Controller
 @RequestMapping("/feedback")
@@ -49,6 +60,19 @@ public class FeedbackController {
         if (feedbackService.hasFeedbackForBooking(bookingId)) {
             redirectAttributes.addFlashAttribute("error", "You have already submitted feedback for this booking");
             return "redirect:/bookings/my-bookings";
+        }
+
+        // Auto-complete the booking if it's not already completed
+        if (!"COMPLETED".equals(booking.getStatus())) {
+            booking.setStatus("COMPLETED");
+            bookingService.updateBooking(booking);
+            
+            // Make car available if not already
+            Car car = booking.getCar();
+            if (!car.isAvailabilityStatus()) {
+                car.setAvailabilityStatus(true);
+                carService.updateCar(car);
+            }
         }
 
         model.addAttribute("booking", booking);
