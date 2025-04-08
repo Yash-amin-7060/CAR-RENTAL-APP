@@ -36,16 +36,6 @@
 </head>
 <body>
     <div layout:fragment="content">
-        <div class="container py-5">
-            <div class="text-center">
-                <h1>Welcome to Car Rental Service</h1>
-                <p class="lead">Find and book your perfect rental car today!</p>
-                <a th:href="@{/cars}" class="btn btn-primary btn-lg">
-                    <i class="bi bi-car-front"></i> Browse Cars
-                </a>
-            </div>
-        </div>
-
         <!-- Success Message -->
         <div th:if="${param.login_success}" class="alert alert-success alert-dismissible fade show m-3" role="alert" id="loginAlert">
             Welcome back! You have successfully logged in.
